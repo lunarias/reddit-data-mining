@@ -15,10 +15,10 @@ subreddits = {''}
 done_users = 0
 for user in users:
     try:
-        comments = api.search_submissions(author=user, after=1577836800, before=1609459199, mem_safe=True)
-        comment_list = [comment for comment in comments]
-        for comment in comment_list:
-            subreddit = comment['subreddit']
+        posts = api.search_submissions(author=user, after=1577836800, before=1609459199, mem_safe=True)
+        post_list = [post for post in posts]
+        for post in post_list:
+            subreddit = post['subreddit']
             if subreddit not in subreddits:
                 subreddits.add(subreddit)
         done_users += 1
