@@ -1,0 +1,2 @@
+Criteria    # Nodes (Subreddits)
+Top 100 most active users on r/Ucalgary 683
