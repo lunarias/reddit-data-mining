@@ -16,7 +16,7 @@ file = pd.DataFrame()
 index = 0
 
 for subreddit in subreddits:
-    file = file.append({'Id':str(index), 'Label': subreddit, 'Category':''}, ignore_index=True)
+    file = file.append({'Id':str(index), 'Label': '\"%s\"'%subreddit, 'Category':''}, ignore_index=True)
     index+=1
 
 file.to_csv(NODES_CSV_PATH, sep=';', index=False, encoding='utf-8')
