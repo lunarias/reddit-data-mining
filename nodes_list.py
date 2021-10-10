@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 
 REDDIT_ROOT_PATH = Path(__file__).parent.absolute()
-USERS_DATA_PATH = "{}/data/user_data.txt".format(REDDIT_ROOT_PATH)
+USERS_DATA_PATH = "{}/data/user_data_no_user_profiles.txt".format(REDDIT_ROOT_PATH)
 NODES_CSV_PATH = "{}/data/subreddit_nodes.csv".format(REDDIT_ROOT_PATH)
 
 #Get subreddit names
