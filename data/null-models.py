@@ -87,7 +87,12 @@ G_unweighted_random = nx.expected_degree_graph(degrees, selfloops=False)
 clustering = []
 path_length = []
 degree_centrality = []
-eigen_centrality = []
+eigenvector_centrality = []
+
+#Degree and eigen vector centrality are fixed
+G = nx.expected_degree_graph(degrees, selfloops=False)
+avg_degree_centrality = statistics.mean(nx.degree_centrality(G))
+avg_eigenvector_centrality = statistics.mean(getEigenvectorCentrality(G))
 
 
 shortest_path = nx.shortest_path_length(G_unweighted_random, source=0, target=0)
@@ -96,54 +101,49 @@ for i in range(0, RUNS):
     G = nx.expected_degree_graph(degrees, selfloops=False)
     
     avg_clustering = clusteringCoefficient(G, "weight")
-    avg_path = getAveragePathLength(G)
-    avg_degree_centrality = statistics.mean(nx.degree_centrality(G))
-    avg_eigenvector_centrality = statistics.mean(getEigenvectorCentrality(G))
+    avg_path = getAveragePathLength(G)  
 
     clustering.append(avg_clustering)
     path_length.append(avg_path)  
-    degree_centrality.append(avg_degree_centrality)
-    eigen_centrality.append(avg_eigenvector_centrality)
 
     
 avg_clustering = statistics.mean(clustering)
 avg_path_length = statistics.mean(path_length)
-avg_degree_centrality = statistics.mean(avg_degree_centrality)
-avg_eigenvector_centrality = statistics.mean(avg_eigenvector_centrality)
+
 
 print(f'Average clustering coefficient (unweighted): {avg_clustering}\n\
         Average path length (unweighted): {avg_path_length}\n\
-        Degree centrality (unweighted):{avg_degree_centrality}\
-        Eigenvector centrality (unweighted): {avg_eigenvector_centrality}\
+        Degree centrality (unweighted):{avg_degree_centrality}\n\
+        Average Eigenvector centrality (unweighted): {avg_eigenvector_centrality}\n\
         Runs: {RUNS}\n\n'
     )
 
 #Graph with fixed, original edges (degree preserved) but weights are randomized
 
-clustering = []
-path_length = []
-degree_centrality = []
-eigen_centrality = []
+clustering_weighted = []
+path_length_weighted = []
+eigenvector_centrality_weighted = []
 
 for i in range(0, RUNS):
     G = randomWeightedGraph(nodes, edges)
-    avg_clustering = clusteringCoefficient(G, "weight")
-    avg_path = getAveragePathLength(G, weight='weight')
+    avg_clustering_weighted = clusteringCoefficient(G, "weight")
+    avg_path = nx.average_shortest_path_length(G, weight="djikstra")
     avg_eigenvector_centrality = statistics.mean(getEigenvectorCentrality(G, "weight"))
-    
-    clustering.append(avg_clustering)
-    path_length.append(avg_path)    
-    if (i%100 == 0):
-        print(f"clustering:{avg_clustering} path length: {avg_path}")
+
+    clustering_weighted.append(avg_clustering)
+    path_length_weighted.append(avg_path) 
+    eigenvector_centrality_weighted.append(avg_eigenvector_centrality)   
 
 
-avg_clustering = statistics.mean(clustering)
-avg_path_length = statistics.mean(path_length)   
-avg_eigenvector_centrality = statistics.mean(avg_eigenvector_centrality)
+avg_clustering = statistics.mean(clustering_weighted)
+avg_path_length = statistics.mean(path_length_weighted)   
+avg_eigenvector_centrality = statistics.mean(eigenvector_centrality_weighted)
 
 print(f'Average clustering coefficient (weighted): {avg_clustering}\n\
         Average path length (weighted): {avg_path_length}\n\
-        Eigenvector centrality (weighted): {avg_eigenvector_centrality}\
+        Average Eigenvector centrality (weighted): {avg_eigenvector_centrality}\n\
         Runs: {RUNS}'
     )
+
+print("-----------------------END")
 
