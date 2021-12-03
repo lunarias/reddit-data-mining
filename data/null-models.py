@@ -143,7 +143,6 @@ avg_eigenvector_centrality = statistics.mean(avg_eigenvector_centrality)
 
 print(f'Average clustering coefficient (weighted): {avg_clustering}\n\
         Average path length (weighted): {avg_path_length}\n\
-        Degree centrality (weighted):{avg_degree_centrality}\
         Eigenvector centrality (weighted): {avg_eigenvector_centrality}\
         Runs: {RUNS}'
     )
