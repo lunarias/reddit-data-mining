@@ -4,5 +4,5 @@ standard deviation of clustering coefficient (unweighted) is 0.16523919337582474
 average clustering coefficient (weighted): 0.029192396290506885
 standard deviation of clustering coefficient (weighted) is 0.006279598591702775
 
-standard deviation of shortest path lengths is 0.24529993149507967
-average shortest path length is 1.9390897911151637
+standard deviation of shortest path lengths is 0.678852893167787
+average shortest path length is 2.384414268864883
