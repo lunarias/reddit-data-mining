@@ -14,6 +14,7 @@ df_user = pd.read_csv(USERS_DATA_PATH, sep='\t')
 #Write to .csv nodes file
 file = pd.DataFrame()
 
+#Get edges for subreddit nodes
 edges_dict = {}
 for user_index in range(len(df_user)):
     subreddits = df_user.loc[user_index][3:].to_frame().reset_index().rename(columns = {'index':'subreddit'})
@@ -33,5 +34,4 @@ edges_list = sorted(edges_dict.items())
 for edge in edges_list:
     file = file.append({'Source': str(edge[0][0]), 'Target': str(edge[0][1]), 'Weight':str(edge[1])}, ignore_index=True)
 
-# print(file)
 file.to_csv(EDGES_CSV_PATH, sep=';', index=False, encoding='utf-8')

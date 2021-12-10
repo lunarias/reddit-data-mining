@@ -1,0 +1,16 @@
+Average clustering coefficient (unweighted): 0.20802976929827197
+        Average path length (unweighted): 2.1799599608176474
+        Degree centrality (unweighted):336.5
+        Average Eigenvector centrality (unweighted): 336.5
+        Standard deviation clustering coefficient (unweighted): 0.004663160472406257
+        Standard deviation path length (unweighted): 0.008224536868330471
+        Runs: 1000
+
+
+Average clustering coefficient (weighted): 0.20802976929827197
+        Average path length (weighted): 1.9420637475143407
+        Average Eigenvector centrality (weighted): 336.5
+        Standard deviation clustering coefficient (weighted): 0.0
+        Standard deviation path length (weighted): 0.0
+        Runs: 1000
+-----------------------END

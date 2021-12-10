@@ -15,6 +15,7 @@ subreddits = list(df.columns.values)[2:]
 file = pd.DataFrame()
 index = 0
 
+#Get all subreddits and create a node for them for gephi .csv node input
 for subreddit in subreddits:
     file = file.append({'Id':str(index), 'Label': '\"%s\"'%subreddit, 'Category':''}, ignore_index=True)
     index+=1

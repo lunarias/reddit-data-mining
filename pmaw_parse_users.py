@@ -1,3 +1,7 @@
+"""
+    This module gets the number of unique subreddits we will have in our graph
+    and was used to estimate the size of the network at the start of the project.
+"""
 from pmaw import PushshiftAPI
 from pathlib import Path
 
