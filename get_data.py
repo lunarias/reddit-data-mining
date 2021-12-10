@@ -12,18 +12,24 @@ df = df.drop('UCalgary_Submissions', 1)
 
 api = PushshiftAPI()
 
+# start of day jan 1 2020
 jan_1_2020_epoch = 1577836800
+# end of day dec 
 dec_31_2020_epoch = 1609459199
 
 user_activity = {}
 unique_subreddits = set()
+# iterate over users
 for row in df.itertuples(index=False):
-    curr_subreddits = set()
+    curr_subreddits = set() # subreddits current user was active in
     user = row.User
+    # fetch all posts for current user between jan 1 2020 and dec 31 2020
     posts = api.search_submissions(author=user, after=jan_1_2020_epoch, before=dec_31_2020_epoch, mem_safe=True)
+    # api returns a generator so we convert to list
     post_list = [post for post in posts]
     for post in post_list:
         subreddit = post['subreddit']
+        # add current subreddit to current user's activity if not already included
         if subreddit not in unique_subreddits:
             unique_subreddits.add(subreddit)
             curr_subreddits.add(subreddit)
@@ -32,9 +38,11 @@ for row in df.itertuples(index=False):
             curr_subreddits.add(subreddit)
     user_activity[user] = list(curr_subreddits)
 
+# fill user activity table with zeroes
 for subreddit in unique_subreddits:
     df[subreddit] = [0 for i in range(df.shape[0])]
 
+# if user was active in a subreddit, change value in user activity table to 1
 for index, user in enumerate(user_activity):
     for subreddit in user_activity[user]:
         df.at[index, subreddit] = 1
