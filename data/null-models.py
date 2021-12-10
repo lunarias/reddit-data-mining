@@ -7,26 +7,21 @@ from random import seed
 import statistics
 from collections import Counter
 
+#Number of times to iterate over each model
 RUNS = 1000
 nodes = pd.read_csv("subreddit_nodes.csv", index_col=0)
 edges = pd.read_csv("subreddit_edges.csv", delimiter=';')
 
 #Weighted graph
-# G_weighted = nx.Graph()
-# for index, row in nodes.iterrows():
-#     G_weighted.add_node(index, name=row['Label'], category=row['Category'])
+G_weighted = nx.Graph()
+for index, row in nodes.iterrows():
+    G_weighted.add_node(index, name=row['Label'], category=row['Category'])
 
-# for index, row in edges.iterrows():
-#     G_weighted.add_edge(row['Source'], row['Target'], weight=row['Weight'])
-
-
-# #print(f"Degrees are:${G.degree()}")
+for index, row in edges.iterrows():
+    G_weighted.add_edge(row['Source'], row['Target'], weight=row['Weight'])
 
 
-# #print(degrees)
-
-
-# #Unweighted
+# Unweighted
 G_unweighted = nx.Graph()
 for index, row in nodes.iterrows():
     G_unweighted.add_node(index, name=row['Label'], category=row['Category'])
@@ -40,8 +35,10 @@ degrees = [val for (node,val) in G_unweighted.degree()]
 def clusteringCoefficient(G, weight=None):  
     return nx.average_clustering(G, weight=weight)
     
+def getEigenvectorCentrality(G, weight=None):
+    return nx.eigenvector_centrality(G, weight=weight)
 
-#Random graph
+#Function to generate random graph, degree preserved with weights
 def randomWeightedGraph(nodes, edges):
     G = nx.Graph()
     for index, row in nodes.iterrows():
@@ -54,17 +51,7 @@ def randomWeightedGraph(nodes, edges):
     return G
 
 
-def getWeights(g):
-    avg = 0
-    for item in g.edges.data():
-        avg+=item[2]['weight']
-    print(avg/len(g.edges.data()))
-
-def getEigenvectorCentrality(G, weight=None):
-    return nx.eigenvector_centrality(G, weight=weight)
-
-
-    
+#Function to get the average path length
 def getAveragePathLength(G, weight=None):
     num_nodes = G.number_of_nodes()
     all_lengths = []
@@ -82,20 +69,15 @@ def getAveragePathLength(G, weight=None):
     return avg_shortest
 
 
-#Graph with edges randomized (degree preserved), unweighted graph
-
+#Generate null model with edges randomized (degree preserved), unweighted graph
 G_unweighted_random = nx.expected_degree_graph(degrees, selfloops=False)
-#print(G.edges.data())
-#print(nx.info(G_unweighted_random))
-
-#print(nx.betweenness_centrality(G_unweighted_random))
-
-#print()
 
 clustering = []
 path_length = []
 degree_centrality = []
+avg_clustering = []
 eigenvector_centrality = []
+std_clustering = -1
 #for each node
 all_nodes_betweeness = [0]*674
 all_nodes_clustering = [0]*674
@@ -109,13 +91,21 @@ nodes_clustering = nx.clustering(G)
 
 shortest_path = nx.shortest_path_length(G_unweighted_random, source=0, target=0)
 
-#print(nx.clustering(G))
-
+#Remove uCalgary node for path length calculation
+degrees.remove(673)
 for i in range(0, RUNS):
     G = nx.expected_degree_graph(degrees, selfloops=False)
     
-    avg_clustering = clusteringCoefficient(G, "weight")
-    avg_path = getAveragePathLength(G)  
+    avg_clustering = clusteringCoefficient(G)
+
+    shortest_paths = nx.shortest_path_length(G)
+    shortest_paths = dict(shortest_paths)
+    avg_path = []
+    for node, info in shortest_paths.items():
+        for node, dist in info.items():
+            avg_path.append(dist)
+
+    avg_path = statistics.mean(avg_path)
     nodes_betweeness = nx.betweenness_centrality(G)
     nodes_clustering = nx.clustering(G)
     nodes_eigenvector = nx.eigenvector_centrality(G)
@@ -125,7 +115,6 @@ for i in range(0, RUNS):
 
     all_nodes_betweeness = [a + b for a, b in zip(all_nodes_betweeness, nodes_betweeness.values())]
     all_nodes_clustering = [a + b for a, b in zip(all_nodes_clustering, nodes_clustering.values())]
-    all_nodes_eigenvector = [a + b for a, b in zip(all_nodes_eigenvector, nodes_eigenvector.values())]
 
 
 f = lambda x: x/RUNS
@@ -150,8 +139,8 @@ print(f'Average clustering coefficient (unweighted): {avg_clustering}\n\
         Runs: {RUNS}\n\n'
     )
 
-#Graph with fixed, original edges (degree preserved) but weights are randomized
 
+#Generate weighted null model with fixed, original edges (degree preserved) but weights are randomized
 clustering_weighted = []
 path_length_weighted = []
 eigenvector_centrality_weighted = []
@@ -159,17 +148,29 @@ eigenvector_centrality_weighted = []
 all_nodes_betweeness_weighted =  [0]*674
 all_nodes_clustering_weighted =  [0]*674
 all_nodes_eigenvector_weighted =  [0]*674
+avg_eigenvector_centrality_weighted = -1
+std_clustering_weighted = -1
+std_path_length_weighted = -1
 
 for i in range(0, RUNS):
     G = randomWeightedGraph(nodes, edges)
+    G.remove_node(185)
     avg_clustering_weighted = clusteringCoefficient(G, "weight")
-    avg_path = nx.average_shortest_path_length(G, weight="djikstra")
+
+    shortest_paths = nx.shortest_path_length(G, weight="weight")
+    shortest_paths = dict(shortest_paths)
+    avg_path = []
+    for node, info in shortest_paths.items():
+        for node, dist in info.items():
+            avg_path.append(dist)
+
+    avg_path = statistics.mean(avg_path)
     avg_eigenvector_centrality = statistics.mean(getEigenvectorCentrality(G, "weight"))
     nodes_betweeness_weighted = nx.betweenness_centrality(G, weight="weight")
     nodes_clustering_weighted = nx.clustering(G, weight="weight")
     nodes_eigenvector_weighted = nx.eigenvector_centrality(G, weight="weight")
 
-    clustering_weighted.append(avg_clustering)
+    clustering_weighted.append(avg_clustering_weighted)
     path_length_weighted.append(avg_path) 
     eigenvector_centrality_weighted.append(avg_eigenvector_centrality)   
 
@@ -200,7 +201,7 @@ print(f'Average clustering coefficient (weighted): {avg_clustering_weighted}\n\
 
 print("-----------------------END")
 
-#Create csv for all measurements
+#Create csv for all measurements (centrality, path length, clustering)
 stats = pd.DataFrame(
     columns=['Graph type', 'Avg clustering coeff', 'Avg path length', 'Std clustering coeff', 'Std path length', 'Avg Degree centrality', 'Avg Eigenvector centrality'],
     data=[['Unweighted', avg_clustering, avg_path_length, std_clustering, std_path_length, avg_degree_centrality, avg_eigenvector_centrality], 
@@ -216,10 +217,10 @@ nodes['Clustering coefficient centrality weighted']= pd.Series(all_nodes_cluster
 nodes['Betweeness centrality weighted']= pd.Series(all_nodes_betweeness_weighted)
 nodes['Eigenvector centrality weighted']= pd.Series(all_nodes_eigenvector_weighted)
 
-#nodes['Clustering coeiff unweighted (each node)']= pd.Series(all_nodes_betweeness)
-# nodes_stats = pd.DataFrame(columns=['Clustering coeiff (each node)'],
-#                 data=[[all_nodes_betweeness]]
-#             )
+nodes['Clustering coeiff unweighted (each node)']= pd.Series(all_nodes_betweeness)
+nodes_stats = pd.DataFrame(columns=['Clustering coeiff (each node)'],
+                data=[[all_nodes_betweeness]]
+            )
 
 stats.to_csv('null-models-basic-stats.csv', sep=',')
 nodes.to_csv("null-models-nodes-stats.csv", sep=',')
